@@ -1,0 +1,70 @@
+{
+  "source": {
+    "title": "Tractatus Logico-Philosophicus",
+    "author": "Ludwig Wittgenstein",
+    "translator": "C. K. Ogden",
+    "contributor": "Bertrand Russell (preface)",
+    "first_publication": 1922,
+    "gutenberg_id": 5740,
+    "release_date": "2010-10-22 (revised 2021-12-13)",
+    "source_url": "https://www.gutenberg.org/files/5740/5740-t/5740-t.tex",
+    "license": "Public Domain (US, Project Gutenberg)."
+  },
+  "files": [
+    {
+      "path": "data/5740-t.tex",
+      "role": "canonical source (LaTeX)",
+      "sha256": "52158eed80f03552c257e22dca26e1684588814554481242be94063ce9c6061f",
+      "bytes": 380896
+    },
+    {
+      "path": "data/tractatus.txt",
+      "role": "derived plain text (regex-stripped LaTeX, lossy)",
+      "sha256": "e9be2ec3cd3b29450fb022a82cdbc8af7cb855d68a4d0a0fd248c941d94c21b7",
+      "bytes": 313272
+    }
+  ],
+  "extraction": {
+    "method": "Python re-based LaTeX stripping (preamble/comments/macros). Imperfect; canonical source remains 5740-t.tex.",
+    "char_count": 310642,
+    "line_count": 10206
+  },
+  "main_propositions_detected": {
+    "1": {
+      "phrase": "The world is everything that is the case.",
+      "found": true,
+      "char_offset": 40006
+    },
+    "2": {
+      "phrase": "What is the case, the fact, is the existence of atomic facts.",
+      "found": true,
+      "char_offset": 40797
+    },
+    "3": {
+      "phrase": "The logical picture of the facts is the thought.",
+      "found": true,
+      "char_offset": 49987
+    },
+    "4": {
+      "phrase": "The thought is the significant proposition.",
+      "found": true,
+      "char_offset": 64853
+    },
+    "5": {
+      "phrase": "Propositions are truth-functions of elementary propositions.",
+      "found": true,
+      "char_offset": 96337
+    },
+    "6": {
+      "phrase": "The general form of truth-function is",
+      "found": true,
+      "char_offset": 135856
+    },
+    "7": {
+      "phrase": "Whereof one cannot speak, thereof one must be silent.",
+      "found": true,
+      "char_offset": 162542
+    }
+  },
+  "all_seven_detected": true
+}
