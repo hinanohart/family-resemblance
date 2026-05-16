@@ -78,7 +78,7 @@ fs = feature_similarity(X[0], X[1], kernel="match")
 The `fr` console script is installed automatically.
 
 ```bash
-fr version                                       # 0.1.0.dev0
+fr version                                       # 0.1.0
 fr cluster path/to/X.csv --eps 0.4 --min-samples 2
 fr inspect path/to/X.csv --threshold 0.5
 fr --help

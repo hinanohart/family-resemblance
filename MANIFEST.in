@@ -11,8 +11,10 @@ recursive-include tests *.py
 recursive-include src/family_resemblance *.py
 
 # data/ holds a 22000-line Tractatus PD corpus that runtime never touches;
-# keep it out of the sdist to avoid bloating PyPI downloads.
+# keep it out of the sdist to avoid bloating PyPI downloads, but ship
+# PROVENANCE.md so README links resolve on PyPI.
 prune data
+include data/PROVENANCE.md
 prune build
 prune dist
 prune .venv

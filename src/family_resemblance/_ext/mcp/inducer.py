@@ -51,6 +51,10 @@ def induce_with_confidence(
     private-language argument (PI §243-315): a "rule" induced from a
     single use is not yet a rule. Pass ``hide_below_support=False`` to
     bypass the gate (useful for tests and debugging).
+
+    Note: this is a *hide* gate, not a contradiction-driven *discard*.
+    Contradiction-driven discard (PI §139 picture-and-application replay
+    loop) is roadmapped for v0.2 via ``SchemaCandidate.contradictions``.
     """
     if min_support <= 0:
         raise ValueError(f"min_support must be > 0; got {min_support}")

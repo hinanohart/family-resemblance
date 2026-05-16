@@ -41,7 +41,9 @@ class UseTrace:
 
     @classmethod
     def from_json(cls, s: str) -> "UseTrace":
-        return cls(**json.loads(s))
+        data = json.loads(s)
+        known = {f.name for f in _dc.fields(cls)}
+        return cls(**{k: v for k, v in data.items() if k in known})
 
 
 __all__ = ["UseTrace"]

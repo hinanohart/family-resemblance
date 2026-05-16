@@ -62,14 +62,29 @@ This library takes that picture as its data structure. A cluster has no
 centre and no prototype: only a weighted aggregation of pairwise
 feature-similarities (see [`core/wfr.py`](src/family_resemblance/core/wfr.py)).
 
+No language model is in the loop. Schema induction, family membership,
+and the therapeutic boundary check are pure-mechanical (numpy / scikit-learn
+/ genson only). The package does not ship, call, or fine-tune an LLM.
+
+## Wittgenstein → API map
+
+| PI § | Concept                                  | API surface                                |
+| ---- | ---------------------------------------- | ------------------------------------------ |
+| §43  | meaning = use                            | `UseTrace` (`[mcp]` extra)                 |
+| §65–67 | family resemblance, no shared essence  | `WFRCluster`                               |
+| §133 | honest, therapeutic limit                | `describe()` / `TherapeuticResponse`       |
+| §201 | rule-following indeterminacy             | DBSCAN noise label `-1`                    |
+| §243–315 | private-language argument            | `induce_with_confidence` `min_support` hide gate |
+
 ## How is this different from Prototypical Networks?
 
 |                              | Prototypical Networks (Snell+ 2017) | family-resemblance                            |
 | ---------------------------- | ----------------------------------- | --------------------------------------------- |
 | Cluster representation       | mean / centroid                     | none                                          |
 | Membership test              | nearest centroid                    | density-connected via pairwise resemblance    |
+| Boundary / low-confidence    | hard nearest assignment             | honest `TherapeuticResponse` (PI §133)        |
 | Wittgenstein integration     | none                                | §65–67, §133, §201, §243–315 cited in API     |
-| sklearn-compatible           | partial                             | yes (`BaseEstimator + ClusterMixin`)          |
+| sklearn-compatible           | partial                             | yes (`ClusterMixin + BaseEstimator`)          |
 | Distance must be metric      | yes                                 | no — non-transitive resemblance is supported  |
 | Per-feature weighting        | learned                             | user-supplied (renormalised); v0.2 will learn |
 
@@ -113,6 +128,22 @@ schema, conf = induce_with_confidence(
 The FastMCP server in `_ext/mcp/server.py` is currently a skeleton; the
 full induce-then-replay loop, SQLite-backed `UseTrace` persistence, and
 `SchemaCandidate.contradictions` tracking ship in v0.2.
+
+A runnable `examples/mcp_translate_demo.py` is roadmapped for v0.2
+alongside the FastMCP transport wiring; until then the snippet above is
+the reference demo for the `[mcp]` extra.
+
+## Related work
+
+- **Rosch (1975)** — classical *prototype theory* of categorisation,
+  the position this library deliberately rejects by removing centres
+  from clusters.
+- **arXiv:2601.01127** — *Weighted Family Resemblance Clustering*; the
+  pairwise similarity formulation ported in `core/wfr.py`.
+- **[LGDL](https://github.com/marcoeg/LGDL)** by Marco Graziano —
+  grammar-driven language-game framework. Complementary: LGDL fixes
+  grammars up front, whereas `family-resemblance` lets families form
+  from observed use.
 
 ## License and data
 

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from sklearn.exceptions import NotFittedError
 
 from family_resemblance import WFRCluster
 
@@ -59,8 +60,21 @@ def test_wfrcluster_family_membership_full_confidence(two_groups):
 
 
 def test_wfrcluster_family_membership_before_fit_raises():
-    with pytest.raises(RuntimeError, match=r"fit\(\)"):
+    with pytest.raises(NotFittedError):
         WFRCluster().family_membership()
+
+
+def test_wfrcluster_mixin_order_is_sklearn_compliant():
+    from sklearn.base import BaseEstimator, ClusterMixin
+
+    mro = WFRCluster.__mro__
+    assert mro.index(ClusterMixin) < mro.index(BaseEstimator)
+
+
+def test_wfrcluster_rejects_nan_input():
+    X = np.array([[0.0, np.nan], [1.0, 2.0]])
+    with pytest.raises(ValueError, match="finite"):
+        WFRCluster().fit(X)
 
 
 def test_wfrcluster_validates_eps_range():

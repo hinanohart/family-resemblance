@@ -12,13 +12,14 @@ from typing import Optional, Union
 import numpy as np
 from sklearn.base import BaseEstimator, ClusterMixin
 from sklearn.cluster import DBSCAN
+from sklearn.utils.validation import check_is_fitted
 
 from .wfr import wfr_distance
 
 ArrayLike = Union[np.ndarray, list, tuple]
 
 
-class WFRCluster(BaseEstimator, ClusterMixin):
+class WFRCluster(ClusterMixin, BaseEstimator):
     """Weighted Family Resemblance clustering — prototype-free.
 
     Parameters
@@ -107,8 +108,7 @@ class WFRCluster(BaseEstimator, ClusterMixin):
 
         Returns 0 for noise points (label = -1) and for singleton families.
         """
-        if not hasattr(self, "distance_matrix_") or not hasattr(self, "labels_"):
-            raise RuntimeError("fit() must be called before family_membership()")
+        check_is_fitted(self, ["labels_", "distance_matrix_"])
         labels = self.labels_
         n = len(labels)
         conf = np.zeros(n, dtype=float)

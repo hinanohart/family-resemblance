@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0.dev0] - 2026-05-17
+## [0.1.0] - 2026-05-17
 
 ### Added
 
@@ -60,10 +60,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - SQLite-backed `UseTrace` persistence (Layer L3 in the architecture).
 - Bootstrap confidence intervals / p-values for `family_membership()`.
-- `SchemaCandidate.contradictions` counter wired into induce-then-replay.
+- `SchemaCandidate.contradictions` counter wired into induce-then-replay
+  (PI §139 picture-and-application loop).
+- `Game(participants, rules, boundary_conf)` dataclass for PI §7 / §23
+  language-game framing of multi-tool boundaries (currently informal).
 - `feature_weights` learning from labelled / unlabelled data.
 - scikit-learn-contrib admission (templates + `check_estimator` pass).
+- `examples/mcp_translate_demo.py` runnable demo for the `[mcp]` extra.
 - `[viz]` plotting helpers for resemblance heatmaps.
 
-[Unreleased]: https://github.com/runza/family-resemblance/compare/v0.1.0.dev0...HEAD
-[0.1.0.dev0]: https://github.com/runza/family-resemblance/releases/tag/v0.1.0.dev0
+[Unreleased]: https://github.com/runza/family-resemblance/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/runza/family-resemblance/releases/tag/v0.1.0

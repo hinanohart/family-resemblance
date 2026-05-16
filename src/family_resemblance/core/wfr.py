@@ -30,6 +30,11 @@ def feature_similarity(
     Returns an array of shape (n_features,) with values in [0, 1] for `rbf`
     and `match`, and in (0, 1] for `linear`. No reduction is performed —
     aggregation is the caller's responsibility (see `wfr_similarity`).
+
+    ``match`` uses exact equality, so it is intended for binary or
+    categorical features. For continuous features prefer ``rbf`` (or
+    discretise first), since two floats produced by different arithmetic
+    paths may compare unequal even when conceptually identical.
     """
     if kernel not in VALID_KERNELS:
         raise ValueError(f"unknown kernel {kernel!r}; valid: {VALID_KERNELS}")
@@ -90,6 +95,8 @@ def wfr_similarity(
     X = np.asarray(X, dtype=float)
     if X.ndim != 2:
         raise ValueError(f"X must be 2-d (n_samples, n_features); got ndim={X.ndim}")
+    if X.size and not np.all(np.isfinite(X)):
+        raise ValueError("X must contain only finite values (no NaN/inf)")
     n, d = X.shape
     if n == 0:
         return np.zeros((0, 0), dtype=float)
@@ -125,10 +132,11 @@ def wfr_distance(
 ) -> np.ndarray:
     """Pairwise WFR distance matrix in [0, 1] = 1 − similarity.
 
-    Suitable for `metric="precomputed"` clustering. The metric is symmetric
-    and zero on the diagonal but does **not** satisfy the triangle
-    inequality in general — DBSCAN/HDBSCAN tolerate this, Ward/Agglomerative
-    with single-link generally do; avoid algorithms that assume a true metric.
+    Suitable for `metric="precomputed"` clustering. The distance is
+    symmetric and zero on the diagonal but does **not** satisfy the
+    triangle inequality in general. DBSCAN/HDBSCAN tolerate this; avoid
+    Ward and complete-link Agglomerative clustering, which assume a true
+    metric.
     """
     return 1.0 - wfr_similarity(X, weights=weights, kernel=kernel, scale=scale)
 

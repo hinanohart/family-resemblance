@@ -10,3 +10,7 @@ without depending on the internal `core.cluster` location.
 from family_resemblance.core.cluster import WFRCluster
 
 __all__ = ["WFRCluster"]
+
+# v0.2 roadmap: wire `sklearn.utils.estimator_checks.check_estimator(WFRCluster())`
+# under `tests/test_sklearn_contrib.py` and document any waivers (notably the
+# non-metric distance, which DBSCAN tolerates but check_estimator does not assert).

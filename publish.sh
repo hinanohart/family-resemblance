@@ -40,11 +40,23 @@ git rev-parse "$TAG" >/dev/null 2>&1 \
 twine check dist/* >/dev/null \
     || { echo "ERROR: twine check failed"; exit 1; }
 
+PKG_VER=$(awk -F'"' '/^version = "/{print $2; exit}' pyproject.toml)
+[ -n "$PKG_VER" ] \
+    || { echo "ERROR: could not parse version from pyproject.toml"; exit 1; }
+[ "$TAG" = "v$PKG_VER" ] \
+    || { echo "ERROR: TAG=$TAG does not match pyproject version v$PKG_VER"; exit 1; }
+ls "dist/${PKG_NAME//-/_}-${PKG_VER}.tar.gz" \
+   "dist/${PKG_NAME//-/_}-${PKG_VER}-py3-none-any.whl" >/dev/null 2>&1 \
+    || { echo "ERROR: dist/ has no artefacts for version $PKG_VER"; exit 1; }
+
 if [ -x .venv/bin/pytest ]; then
     .venv/bin/pytest -q >/dev/null \
-        || { echo "ERROR: pytest not green"; exit 1; }
+        || { echo "ERROR: pytest not green (.venv)"; exit 1; }
+elif command -v pytest >/dev/null 2>&1; then
+    pytest -q >/dev/null \
+        || { echo "ERROR: pytest not green (system)"; exit 1; }
 else
-    echo "  (warn) .venv/bin/pytest not found — skipping test gate"
+    echo "ERROR: neither .venv/bin/pytest nor system pytest available"; exit 1
 fi
 
 CURRENT_GH_USER=$(gh api user --jq .login 2>/dev/null || echo "")
@@ -88,7 +100,15 @@ echo "==> 3/4 create GitHub release"
 if gh release view "$TAG" >/dev/null 2>&1; then
     echo "  release $TAG already exists, skipping"
 else
-    gh release create "$TAG" --notes-file CHANGELOG.md --verify-tag
+    NOTES=$(mktemp)
+    awk -v v="${TAG#v}" '
+        $0 ~ "^## \\[" v "\\]" {flag=1; next}
+        flag && /^## \[/        {exit}
+        flag                    {print}
+    ' CHANGELOG.md > "$NOTES"
+    [ -s "$NOTES" ] || { echo "ERROR: empty release notes for $TAG"; rm -f "$NOTES"; exit 1; }
+    gh release create "$TAG" --notes-file "$NOTES" --verify-tag
+    rm -f "$NOTES"
 fi
 
 echo "==> 4/4 PyPI upload (idempotent via --skip-existing)"

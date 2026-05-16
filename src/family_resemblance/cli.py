@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import numpy as np
 import typer
@@ -17,8 +18,11 @@ app = typer.Typer(
 )
 
 
-def _load_csv(path: str) -> np.ndarray:
-    return np.loadtxt(path, delimiter=",", dtype=float, ndmin=2)
+def _load_csv(path: Path) -> np.ndarray:
+    try:
+        return np.loadtxt(str(path), delimiter=",", dtype=float, ndmin=2)
+    except ValueError as e:
+        raise typer.BadParameter(f"failed to parse CSV {path}: {e}") from e
 
 
 @app.command()
@@ -29,7 +33,14 @@ def version() -> None:
 
 @app.command()
 def cluster(
-    path: str = typer.Argument(..., help="CSV with rows = samples, cols = features."),
+    path: Path = typer.Argument(
+        ...,
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="CSV with rows = samples, cols = features.",
+    ),
     eps: float = typer.Option(0.5, help="DBSCAN epsilon in WFR distance."),
     min_samples: int = typer.Option(2, help="DBSCAN min_samples."),
     kernel: str = typer.Option("rbf", help="Per-feature similarity kernel."),
@@ -42,7 +53,14 @@ def cluster(
 
 @app.command()
 def inspect(
-    path: str = typer.Argument(..., help="CSV with rows = samples, cols = features."),
+    path: Path = typer.Argument(
+        ...,
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="CSV with rows = samples, cols = features.",
+    ),
     eps: float = typer.Option(0.5),
     min_samples: int = typer.Option(2),
     threshold: float = typer.Option(0.5, help="Confidence threshold (PI §133)."),
