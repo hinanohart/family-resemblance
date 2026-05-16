@@ -8,7 +8,14 @@
     "gutenberg_id": 5740,
     "release_date": "2010-10-22 (revised 2021-12-13)",
     "source_url": "https://www.gutenberg.org/files/5740/5740-t/5740-t.tex",
-    "license": "Public Domain (US, Project Gutenberg)."
+    "license": "Public Domain (US, Project Gutenberg).",
+    "original_language": "German",
+    "original_publication": "1921 (Annalen der Naturphilosophie)",
+    "edition_layout": "bilingual: German original + Ogden English translation interleaved",
+    "contains_languages": [
+      "de",
+      "en"
+    ]
   },
   "files": [
     {
