@@ -88,6 +88,15 @@ def test_build_server_returns_description():
     assert desc["induce_then_replay"]["min_support"] == 5
 
 
+def test_inducer_type_hints_resolvable():
+    """get_type_hints must resolve every annotation so autodoc tools work."""
+    from typing import get_type_hints
+
+    hints = get_type_hints(induce_with_confidence)
+    assert "return" in hints
+    assert "samples" in hints
+
+
 def test_summarise_traces_groups_and_gates():
     traces = [
         UseTrace(name="t1", args={"a": 1}, ret=None),

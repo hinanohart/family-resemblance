@@ -99,6 +99,21 @@ def test_wfrcluster_sklearn_compat_reexport_is_same_class():
     assert W1 is W2
 
 
+def test_wfrcluster_handles_empty_input():
+    wfr = WFRCluster(min_samples=1).fit(np.zeros((0, 2)))
+    assert wfr.labels_.shape == (0,)
+    assert wfr.family_membership().shape == (0,)
+
+
+def test_wfrcluster_singleton_family_zero_confidence():
+    # min_samples=1 lets a lone point become its own cluster; co-member mask is
+    # empty so confidence stays 0 (cluster.py family_membership singleton branch).
+    X = np.array([[0.0, 0.0]])
+    wfr = WFRCluster(eps=0.5, min_samples=1).fit(X)
+    assert wfr.labels_[0] == 0
+    assert wfr.family_membership().tolist() == [0.0]
+
+
 def test_wfrcluster_default_params_settable():
     wfr = WFRCluster(kernel="linear", scale=2.0)
     assert wfr.kernel == "linear"

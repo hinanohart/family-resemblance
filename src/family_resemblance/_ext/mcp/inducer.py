@@ -6,7 +6,7 @@ motivates emitting a confidence rather than a final, definite schema.
 
 from __future__ import annotations
 
-from typing import Any, Iterable, Tuple
+from typing import Any, Iterable
 
 try:
     from genson import SchemaBuilder  # type: ignore
@@ -38,7 +38,7 @@ def induce_with_confidence(
     samples: Iterable[Any],
     min_support: int = 3,
     hide_below_support: bool = True,
-) -> Tuple[Optional[dict], float]:
+) -> tuple[dict | None, float]:
     """Return (schema, confidence) where confidence ∈ [0, 1].
 
     Confidence = min(1, support / min_support); below `min_support` the

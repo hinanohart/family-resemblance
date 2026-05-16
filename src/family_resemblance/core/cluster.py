@@ -80,6 +80,12 @@ class WFRCluster(BaseEstimator, ClusterMixin):
             raise ValueError(
                 f"X must be 2-d (n_samples, n_features); got ndim={X.ndim}"
             )
+        self.n_features_in_ = X.shape[1]
+        if X.shape[0] == 0:
+            # Empty in, empty out — bypass DBSCAN, which rejects empty matrices.
+            self.distance_matrix_ = np.zeros((0, 0), dtype=float)
+            self.labels_ = np.zeros((0,), dtype=int)
+            return self
         weights = (
             None
             if self.feature_weights is None
@@ -91,7 +97,6 @@ class WFRCluster(BaseEstimator, ClusterMixin):
             eps=float(self.eps), min_samples=int(self.min_samples), metric="precomputed"
         )
         self.labels_ = db.fit_predict(D)
-        self.n_features_in_ = X.shape[1]
         return self
 
     def fit_predict(self, X: ArrayLike, y=None) -> np.ndarray:
