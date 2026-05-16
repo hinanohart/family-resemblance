@@ -81,6 +81,11 @@ def wfr_similarity(
     The matrix is symmetric with unit diagonal (a thing resembles itself
     perfectly). It is **not** necessarily transitive — a hallmark of
     family-resemblance (PI §66).
+
+    Memory: a vectorised intermediate of shape ``(n, n, n_features)`` is
+    materialised, so peak memory grows as ``O(n^2 * n_features * 8 bytes)``.
+    For ``n = 10000, n_features = 10`` this is ~8 GiB; chunk your input or
+    pre-aggregate features for large ``n``.
     """
     X = np.asarray(X, dtype=float)
     if X.ndim != 2:

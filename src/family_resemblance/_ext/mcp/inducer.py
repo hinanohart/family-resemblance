@@ -35,19 +35,31 @@ def induce_schema(samples: Iterable[Any]) -> dict:
 
 
 def induce_with_confidence(
-    samples: Iterable[Any], min_support: int = 3
-) -> Tuple[dict, float]:
+    samples: Iterable[Any],
+    min_support: int = 3,
+    hide_below_support: bool = True,
+) -> Tuple[Optional[dict], float]:
     """Return (schema, confidence) where confidence ∈ [0, 1].
 
     Confidence = min(1, support / min_support); below `min_support` the
     schema is treated as provisional (PI §201, family-resemblance limit
     on rule-following).
+
+    When ``hide_below_support`` is True (the default) and the number of
+    observed samples is below ``min_support``, this function returns
+    ``(None, conf)`` rather than emitting a schema. This realises the
+    private-language argument (PI §243-315): a "rule" induced from a
+    single use is not yet a rule. Pass ``hide_below_support=False`` to
+    bypass the gate (useful for tests and debugging).
     """
-    samples_list = list(samples)
-    schema = induce_schema(samples_list)
     if min_support <= 0:
         raise ValueError(f"min_support must be > 0; got {min_support}")
-    conf = min(1.0, float(len(samples_list)) / float(min_support))
+    samples_list = list(samples)
+    n = len(samples_list)
+    conf = min(1.0, float(n) / float(min_support))
+    if hide_below_support and n < min_support:
+        return None, conf
+    schema = induce_schema(samples_list)
     return schema, conf
 
 

@@ -4,6 +4,13 @@ This module builds (but does not run) a minimal MCP server. It depends on
 the ``[mcp]`` extra. The full induce-then-replay loop is roadmapped for
 v0.2; the Phase 3 skeleton here is sufficient for `family-resemblance[mcp]`
 to be import-tested.
+
+Roadmap (v0.2):
+    - sqlite3-backed ``UseTrace`` persistence (Layer L3 in the architecture).
+    - bootstrap confidence intervals / p-values around the induced confidence
+      (replacing the current ratio-based estimate).
+    - ``SchemaCandidate`` payload with a ``contradictions`` counter, so the
+      induce-then-replay loop can score a candidate against historical traces.
 """
 
 from __future__ import annotations
@@ -35,7 +42,12 @@ def build_server(
 
 
 def summarise_traces(traces: List[UseTrace], min_support: int = 3) -> Dict[str, Any]:
-    """For each tool name in `traces`, induce a schema and report confidence."""
+    """For each tool name in `traces`, induce a schema and report confidence.
+
+    Tools whose ``UseTrace`` count is below ``min_support`` are reported with
+    ``schema = None``; the private-language argument (PI §243-315) refuses to
+    emit a "rule" from a single use.
+    """
     grouped: Dict[str, List[Any]] = {}
     for t in traces:
         grouped.setdefault(t.name, []).append(t.args)

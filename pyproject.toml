@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
   "scikit-learn>=1.4,<2.0",
   "numpy>=1.23,<3.0",
+  "typer>=0.9",
 ]
 
 [project.optional-dependencies]
@@ -40,7 +41,6 @@ viz = [
 dev = [
   "pytest>=7",
   "pytest-cov>=4",
-  "typer>=0.9",
   "rich>=13",
   "build>=1",
   "twine>=4",

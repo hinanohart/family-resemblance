@@ -9,6 +9,7 @@ and no single rule decides its membership.
 from __future__ import annotations
 
 import dataclasses as _dc
+import math
 
 DEFAULT_THRESHOLD: float = 0.5
 
@@ -44,7 +45,10 @@ def describe(
     """Build a `TherapeuticResponse` from a label / confidence pair."""
     if not (0.0 <= float(threshold) <= 1.0):
         raise ValueError(f"threshold must lie in [0, 1]; got {threshold}")
-    conf = float(max(0.0, min(1.0, confidence)))
+    conf_in = float(confidence)
+    if not math.isfinite(conf_in):
+        raise ValueError(f"confidence must be finite; got {confidence!r}")
+    conf = max(0.0, min(1.0, conf_in))
     if int(label) == -1:
         return TherapeuticResponse(
             label=-1,
