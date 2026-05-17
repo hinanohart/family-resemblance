@@ -101,7 +101,9 @@ Non-interactive mode; cannot launch the OAuth web flow.
 Choose ONE manually, then re-run ./publish.sh:
 
   (a) Log in once as $HOMEPAGE_OWNER (recommended; keeps attribution):
-        gh auth login -u $HOMEPAGE_OWNER
+        gh auth login --hostname github.com --git-protocol https --web
+        # log in as $HOMEPAGE_OWNER in the browser, then:
+        ./publish.sh
 
   (b) Publish under ${CURRENT_GH:-<current>} instead (changes attribution):
         sed -i "s|github.com/$HOMEPAGE_OWNER|github.com/${CURRENT_GH:-NEW}|g" \\
@@ -113,16 +115,30 @@ EOF
     fi
 
     echo "Pick how to proceed:"
-    echo "  1) Launch  gh auth login -u $HOMEPAGE_OWNER  now (recommended)"
+    echo "  1) Launch  gh auth login --web  now (log in as $HOMEPAGE_OWNER in the browser; recommended)"
     echo "  2) Switch attribution to ${CURRENT_GH:-<current>} (rewrites repo metadata, commits, retags)"
     echo "  3) Abort"
     read -r -p "Choice [1/2/3]: " choice
     case "$choice" in
         1)
-            gh auth login -u "$HOMEPAGE_OWNER"
+            echo
+            echo "==> Launching gh auth login."
+            echo "    When the browser opens, log in as: $HOMEPAGE_OWNER"
+            echo "    (gh auth login has no -u flag; the active account becomes whoever you log in as.)"
+            echo
+            gh auth login --hostname github.com --git-protocol https --web \
+                || { echo "ERROR: gh auth login failed or was cancelled"; exit 1; }
+            # Force the new login to be the active account (gh defaults to it, but be defensive).
+            if gh auth status 2>&1 | grep -oE 'account [A-Za-z0-9_-]+' | awk '{print $2}' | grep -qx "$HOMEPAGE_OWNER"; then
+                gh auth switch -u "$HOMEPAGE_OWNER" >/dev/null 2>&1 || true
+            fi
             CURRENT_GH=$(gh api user --jq .login 2>/dev/null || echo "")
-            [ "$CURRENT_GH" = "$HOMEPAGE_OWNER" ] \
-                || { echo "ERROR: still not $HOMEPAGE_OWNER after login (got: $CURRENT_GH)"; exit 1; }
+            if [ "$CURRENT_GH" != "$HOMEPAGE_OWNER" ]; then
+                echo "ERROR: still not $HOMEPAGE_OWNER after login (active = ${CURRENT_GH:-none})."
+                echo "       Did you log in as a different user? Rerun ./publish.sh after:"
+                echo "         gh auth switch -u $HOMEPAGE_OWNER   # if $HOMEPAGE_OWNER is now stored"
+                exit 1
+            fi
             ;;
         2)
             [ -n "$CURRENT_GH" ] || { echo "ERROR: no active gh account to switch to"; exit 1; }
