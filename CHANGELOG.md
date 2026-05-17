@@ -40,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Tested
 
-- 72 tests, statement coverage 99% (`pytest --cov=family_resemblance`).
+- 74 tests, statement coverage 98% (`pytest --cov=family_resemblance`);
+  `core/wfr.py`, `core/cluster.py`, `core/therapeutic.py` reach 100%.
 - CLI smoke via `typer.testing.CliRunner`.
 - `get_type_hints()` resolves all `[mcp]` annotations (autodoc-safe).
 
