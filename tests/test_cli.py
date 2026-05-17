@@ -22,7 +22,7 @@ def csv_path(tmp_path):
 def test_version_command():
     result = CliRunner().invoke(app, ["version"])
     assert result.exit_code == 0
-    assert result.stdout.strip() == "0.1.0"
+    assert result.stdout.strip() == "0.1.0.post1"
 
 
 def test_cluster_command(csv_path):

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0.post1] - 2026-05-17
+
+### Fixed
+
+- README relative links (`LICENSE`, `data/PROVENANCE.md`,
+  `src/family_resemblance/core/wfr.py`, `tests/test_provenance_policy.py`,
+  `CHANGELOG.md`) rewritten to absolute `github.com/hinanohart/...` URLs.
+  PyPI renders the README as-is and treats relative links as relative to
+  the PyPI page URL, where they 404. No source-code change.
+- README header gains a PyPI version badge.
+
 ## [0.1.0] - 2026-05-17
 
 ### Added
@@ -70,5 +81,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `examples/mcp_translate_demo.py` runnable demo for the `[mcp]` extra.
 - `[viz]` plotting helpers for resemblance heatmaps.
 
-[Unreleased]: https://github.com/hinanohart/family-resemblance/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/hinanohart/family-resemblance/compare/v0.1.0.post1...HEAD
+[0.1.0.post1]: https://github.com/hinanohart/family-resemblance/releases/tag/v0.1.0.post1
 [0.1.0]: https://github.com/hinanohart/family-resemblance/releases/tag/v0.1.0

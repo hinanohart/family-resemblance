@@ -5,7 +5,8 @@
 > [scikit-learn-compatible](https://scikit-learn.org/) estimator.
 
 [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/hinanohart/family-resemblance/blob/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/family-resemblance.svg)](https://pypi.org/project/family-resemblance/)
 
 ## Install
 
@@ -60,7 +61,7 @@ a family.
 
 This library takes that picture as its data structure. A cluster has no
 centre and no prototype: only a weighted aggregation of pairwise
-feature-similarities (see [`core/wfr.py`](src/family_resemblance/core/wfr.py)).
+feature-similarities (see [`core/wfr.py`](https://github.com/hinanohart/family-resemblance/blob/main/src/family_resemblance/core/wfr.py)).
 
 No language model is in the loop. Schema induction, family membership,
 and the therapeutic boundary check are pure-mechanical (numpy / scikit-learn
@@ -147,16 +148,16 @@ the reference demo for the `[mcp]` extra.
 
 ## License and data
 
-The library is MIT-licensed (see [LICENSE](LICENSE)).
+The library is MIT-licensed (see [LICENSE](https://github.com/hinanohart/family-resemblance/blob/main/LICENSE)).
 
 The `data/` directory contains the *Tractatus Logico-Philosophicus*
 (Project Gutenberg eBook #5740, US public domain, bilingual: Ogden's 1922
 English translation alongside Wittgenstein's German original). See
-[`data/PROVENANCE.md`](data/PROVENANCE.md) for full attribution and for the
+[`data/PROVENANCE.md`](https://github.com/hinanohart/family-resemblance/blob/main/data/PROVENANCE.md) for full attribution and for the
 fair-use policy (≤ 50 words per §, ≤ 250 words across the whole repo) that
 governs quotations from *Philosophical Investigations*. The policy is
 enforced automatically by
-[`tests/test_provenance_policy.py`](tests/test_provenance_policy.py).
+[`tests/test_provenance_policy.py`](https://github.com/hinanohart/family-resemblance/blob/main/tests/test_provenance_policy.py).
 
 ## Citation
 
@@ -175,4 +176,4 @@ is, of course, Wittgenstein's.
 
 ## Status
 
-v0.1 alpha. See [`CHANGELOG.md`](CHANGELOG.md) for the roadmap.
+v0.1 alpha. See [`CHANGELOG.md`](https://github.com/hinanohart/family-resemblance/blob/main/CHANGELOG.md) for the roadmap.
