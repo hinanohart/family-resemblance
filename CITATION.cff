@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Weighted family-resemblance clustering grounded in Wittgenstein PI §65-67"
+authors:
+  - family-names: "Hart"
+    given-names: "Hinano"
+    alias: "hinanohart"
+type: software
+license: "NOASSERTION"
+repository-code: "https://github.com/hinanohart/family-resemblance"
+url: "https://pypi.org/project/family-resemblance/"
+version: "0.1.0"
+date-released: "2026-05-17"
+keywords:
+  - "clustering"
+  - "family-resemblance"
+  - "philosophy"
+  - "python"
+  - "scikit-learn"
+  - "unsupervised"
+  - "wittgenstein"
+  - "prototype-free"
