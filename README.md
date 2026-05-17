@@ -165,7 +165,7 @@ enforced automatically by
   author = {runza},
   title  = {family-resemblance: weighted family-resemblance clustering},
   year   = 2026,
-  url    = {https://github.com/runza/family-resemblance},
+  url    = {https://github.com/hinanohart/family-resemblance},
 }
 ```
 

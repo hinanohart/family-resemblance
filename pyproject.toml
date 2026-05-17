@@ -51,9 +51,9 @@ dev = [
 fr = "family_resemblance.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/runza/family-resemblance"
-Issues = "https://github.com/runza/family-resemblance/issues"
-Documentation = "https://github.com/runza/family-resemblance#readme"
+Homepage = "https://github.com/hinanohart/family-resemblance"
+Issues = "https://github.com/hinanohart/family-resemblance/issues"
+Documentation = "https://github.com/hinanohart/family-resemblance#readme"
 
 [tool.setuptools.packages.find]
 where = ["src"]

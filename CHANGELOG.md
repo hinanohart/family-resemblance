@@ -70,5 +70,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `examples/mcp_translate_demo.py` runnable demo for the `[mcp]` extra.
 - `[viz]` plotting helpers for resemblance heatmaps.
 
-[Unreleased]: https://github.com/runza/family-resemblance/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/runza/family-resemblance/releases/tag/v0.1.0
+[Unreleased]: https://github.com/hinanohart/family-resemblance/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/hinanohart/family-resemblance/releases/tag/v0.1.0
