@@ -1,46 +1,46 @@
 #!/usr/bin/env bash
-# publish.sh — family-resemblance v0.1.0 ONE-shot release script (Phase 7).
-#
-# This is the only manual step in the release pipeline. Build artefacts in
-# dist/, the v0.1.0 git tag, and 74 green tests are produced automatically
-# by Phases 1-6. This script wires them up to GitHub + PyPI.
+# publish.sh — family-resemblance v0.1.0 ONE-script release.
 #
 # Usage:
-#   ./publish.sh              # publish under the gh owner named in pyproject.toml
+#   ./publish.sh              # interactive: handles gh-auth mismatch in-script
 #   ./publish.sh --check      # dry-run; pre-flight only, no push, no upload
+#   ./publish.sh --yes        # non-interactive; auto-switch if possible, else fail
 #
-# Prerequisites:
-#   * `gh` is logged in. The script auto-switches the active account if the
-#     intended owner is already stored. Otherwise it tells you the exact
-#     single command to log in as that owner.
-#   * `~/.pypirc` is configured with a `__token__` entry, OR
-#     `TWINE_USERNAME` / `TWINE_PASSWORD` env vars are set. The script never
-#     reads or echoes those tokens; twine reads them directly.
+# What this script automates (everything except identity):
+#   * pre-flight (clean tree / tag / dist match version / twine check / pytest)
+#   * gh active-account alignment (auto-switch if intended owner is stored)
+#   * interactive `gh auth login` launch when the owner is NOT stored locally
+#   * `gh repo create` (idempotent) + push main + push tag
+#   * GitHub release creation with notes auto-extracted from CHANGELOG
+#   * `twine upload --skip-existing dist/*` (reads ~/.pypirc itself; no token
+#     ever passes through this script)
 #
-# Idempotent: rerunning after a partial failure is safe (gh repo / release /
-# twine all use existence-checks or --skip-existing).
+# What remains manual (physical R11 boundary):
+#   * If gh is not yet logged in as the pyproject Homepage owner, you will
+#     complete ONE OAuth web flow (the script launches `gh auth login` for
+#     you). After that, the script continues automatically.
 
 set -euo pipefail
 cd "$(dirname "$0")"
 
-DRY_RUN=0
+MODE="interactive"
 case "${1:-}" in
-    --check)  DRY_RUN=1 ;;
+    --check)  MODE="check" ;;
+    --yes)    MODE="yes" ;;
     "")       ;;
-    *)        echo "Usage: $0 [--check]"; exit 2 ;;
+    *)        echo "Usage: $0 [--check | --yes]"; exit 2 ;;
 esac
 
 PKG_NAME="family-resemblance"
 PKG_UNDER="${PKG_NAME//-/_}"
 
-# Parse owner + version from pyproject.toml so the script never disagrees
-# with the package metadata.
 HOMEPAGE_OWNER=$(
     awk -F'/' '/Homepage = "https:\/\/github\.com\//{print $4; exit}' pyproject.toml
 )
 PKG_VER=$(awk -F'"' '/^version = "/{print $2; exit}' pyproject.toml)
 TAG="v$PKG_VER"
 
+# ---------- 1/5 Pre-flight ----------
 echo "==> Pre-flight"
 
 [ -n "$HOMEPAGE_OWNER" ] \
@@ -57,7 +57,7 @@ git rev-parse "$TAG" >/dev/null 2>&1 \
 
 ls "dist/${PKG_UNDER}-${PKG_VER}.tar.gz" \
    "dist/${PKG_UNDER}-${PKG_VER}-py3-none-any.whl" >/dev/null 2>&1 \
-    || { echo "ERROR: dist/ has no artefacts for version $PKG_VER (run: python -m build)"; exit 1; }
+    || { echo "ERROR: dist/ has no artefacts for v$PKG_VER (run: python -m build)"; exit 1; }
 twine check dist/* >/dev/null \
     || { echo "ERROR: twine check failed"; exit 1; }
 
@@ -71,22 +71,13 @@ else
     echo "ERROR: neither .venv/bin/pytest nor system pytest available"; exit 1
 fi
 
-# gh auth: try to auto-align active account with HOMEPAGE_OWNER.
+# ---------- 2/5 gh auth alignment ----------
 CURRENT_GH=$(gh api user --jq .login 2>/dev/null || echo "")
-if [ -z "$CURRENT_GH" ]; then
-    cat <<EOF
-ERROR: gh is not authenticated. Run once:
-    gh auth login -u $HOMEPAGE_OWNER
-then re-run: ./publish.sh
-EOF
-    exit 1
-fi
+STORED=$(gh auth status 2>&1 \
+    | grep -oE 'account [A-Za-z0-9_-]+' \
+    | awk '{print $2}' | sort -u | tr '\n' ' ')
 
-if [ "$CURRENT_GH" != "$HOMEPAGE_OWNER" ]; then
-    # Discover all stored gh accounts (regardless of which is active).
-    STORED=$(gh auth status 2>&1 \
-        | grep -oE 'account [A-Za-z0-9_-]+' \
-        | awk '{print $2}' | sort -u | tr '\n' ' ')
+if [ -n "$CURRENT_GH" ] && [ "$CURRENT_GH" != "$HOMEPAGE_OWNER" ]; then
     if echo " $STORED " | grep -q " $HOMEPAGE_OWNER "; then
         echo "==> Switching gh active account: $CURRENT_GH → $HOMEPAGE_OWNER"
         gh auth switch -u "$HOMEPAGE_OWNER" >/dev/null
@@ -94,36 +85,70 @@ if [ "$CURRENT_GH" != "$HOMEPAGE_OWNER" ]; then
     fi
 fi
 
-if [ "$CURRENT_GH" != "$HOMEPAGE_OWNER" ]; then
+if [ -z "$CURRENT_GH" ] || [ "$CURRENT_GH" != "$HOMEPAGE_OWNER" ]; then
     cat <<EOF
-ERROR: gh active user mismatch and the intended owner is not stored locally.
-  pyproject.toml Homepage owner: $HOMEPAGE_OWNER
-  gh active user:                $CURRENT_GH
-  stored accounts:               ${STORED:-(none)}
 
-To finish publishing, pick ONE of:
+──────────────────────────────────────────────────────────────────────
+ gh identity is not aligned with pyproject.toml.
+   pyproject Homepage owner: $HOMEPAGE_OWNER
+   gh active account:        ${CURRENT_GH:-(none)}
+   gh stored accounts:       ${STORED:-(none)}
+──────────────────────────────────────────────────────────────────────
+EOF
+    if [ "$MODE" = "yes" ] || [ "$MODE" = "check" ] || [ ! -t 0 ]; then
+        cat <<EOF
+Non-interactive mode; cannot launch the OAuth web flow.
+Choose ONE manually, then re-run ./publish.sh:
 
   (a) Log in once as $HOMEPAGE_OWNER (recommended; keeps attribution):
         gh auth login -u $HOMEPAGE_OWNER
-        ./publish.sh
 
-  (b) Publish under $CURRENT_GH instead (changes attribution everywhere):
-        sed -i "s|github.com/$HOMEPAGE_OWNER|github.com/$CURRENT_GH|g" \\
+  (b) Publish under ${CURRENT_GH:-<current>} instead (changes attribution):
+        sed -i "s|github.com/$HOMEPAGE_OWNER|github.com/${CURRENT_GH:-NEW}|g" \\
             pyproject.toml CHANGELOG.md README.md
-        git commit -am "chore: switch attribution to $CURRENT_GH"
+        git commit -am "chore: switch attribution"
         python -m build && git tag -f $TAG && ./publish.sh
 EOF
-    exit 1
+        exit 1
+    fi
+
+    echo "Pick how to proceed:"
+    echo "  1) Launch  gh auth login -u $HOMEPAGE_OWNER  now (recommended)"
+    echo "  2) Switch attribution to ${CURRENT_GH:-<current>} (rewrites repo metadata, commits, retags)"
+    echo "  3) Abort"
+    read -r -p "Choice [1/2/3]: " choice
+    case "$choice" in
+        1)
+            gh auth login -u "$HOMEPAGE_OWNER"
+            CURRENT_GH=$(gh api user --jq .login 2>/dev/null || echo "")
+            [ "$CURRENT_GH" = "$HOMEPAGE_OWNER" ] \
+                || { echo "ERROR: still not $HOMEPAGE_OWNER after login (got: $CURRENT_GH)"; exit 1; }
+            ;;
+        2)
+            [ -n "$CURRENT_GH" ] || { echo "ERROR: no active gh account to switch to"; exit 1; }
+            echo "==> Rewriting attribution: $HOMEPAGE_OWNER → $CURRENT_GH"
+            sed -i "s|github.com/$HOMEPAGE_OWNER|github.com/$CURRENT_GH|g" \
+                pyproject.toml CHANGELOG.md README.md
+            git commit -am "chore: switch attribution to $CURRENT_GH" >/dev/null
+            python -m build >/dev/null
+            git tag -f "$TAG" >/dev/null
+            HOMEPAGE_OWNER="$CURRENT_GH"
+            ;;
+        *)
+            echo "Aborted."; exit 1
+            ;;
+    esac
 fi
 
-echo "==> Pre-flight PASS (owner=$HOMEPAGE_OWNER, tag=$TAG, dist=$PKG_VER)"
+echo "==> Pre-flight PASS (owner=$HOMEPAGE_OWNER, tag=$TAG, dist=v$PKG_VER)"
 
-if [ "$DRY_RUN" -eq 1 ]; then
+if [ "$MODE" = "check" ]; then
     echo "==> --check mode: stopping before push/upload."
     exit 0
 fi
 
-echo "==> 1/4 ensure GitHub repo exists (idempotent)"
+# ---------- 3/5 GitHub repo (idempotent) ----------
+echo "==> 3/5 ensure GitHub repo exists"
 if ! gh repo view "$HOMEPAGE_OWNER/$PKG_NAME" >/dev/null 2>&1; then
     gh repo create "$HOMEPAGE_OWNER/$PKG_NAME" --public --source=. --remote=origin --push
 else
@@ -133,11 +158,13 @@ else
     fi
 fi
 
-echo "==> 2/4 push main + tag"
+# ---------- 4/5 push main + tag ----------
+echo "==> 4/5 push main + tag"
 git push origin main
 git push origin "$TAG"
 
-echo "==> 3/4 create GitHub release (notes auto-extracted from CHANGELOG)"
+# ---------- 5/5 GitHub release + PyPI upload ----------
+echo "==> 5/5 GitHub release + PyPI upload"
 if gh release view "$TAG" >/dev/null 2>&1; then
     echo "  release $TAG already exists, skipping"
 else
@@ -152,7 +179,6 @@ else
     rm -f "$NOTES"
 fi
 
-echo "==> 4/4 PyPI upload (idempotent via --skip-existing)"
 twine upload --skip-existing dist/*
 
 echo
