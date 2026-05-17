@@ -6,6 +6,11 @@ import json
 
 import pytest
 
+# Skip entire module at collection time when the [mcp] optional dependencies
+# (genson, jsonschema) are not installed, rather than hard-failing on import.
+pytest.importorskip("genson", reason="requires family-resemblance[mcp] extra")
+pytest.importorskip("jsonschema", reason="requires family-resemblance[mcp] extra")
+
 from family_resemblance._ext.mcp.adapter import is_available
 from family_resemblance._ext.mcp.inducer import induce_schema, induce_with_confidence
 from family_resemblance._ext.mcp.server import build_server, summarise_traces

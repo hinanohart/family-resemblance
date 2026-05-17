@@ -1,0 +1,3 @@
+# Mark the bundled Tractatus eBook (Project Gutenberg #5740) as vendored
+# so GitHub Linguist does not count it toward the primary-language stat.
+data/5740-t.tex linguist-vendored
