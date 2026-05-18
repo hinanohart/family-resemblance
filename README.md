@@ -4,6 +4,7 @@
 > *Philosophical Investigations* §65–67. Prototype-free.
 > [scikit-learn-compatible](https://scikit-learn.org/) estimator.
 
+[![CI](https://github.com/hinanohart/family-resemblance/actions/workflows/ci.yml/badge.svg)](https://github.com/hinanohart/family-resemblance/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/hinanohart/family-resemblance/blob/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/family-resemblance.svg)](https://pypi.org/project/family-resemblance/)
