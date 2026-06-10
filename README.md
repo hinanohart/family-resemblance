@@ -15,16 +15,16 @@
 
 ```mermaid
 flowchart TD
-    Input[Input array X] --> Weights[Feature weights\nnormalised to sum 1]
-    Weights --> FeatureSim[Per-feature similarity\nrbf or linear or match]
-    FeatureSim --> WFRMatrix[Pairwise WFR\ndistance matrix]
-    WFRMatrix --> DBSCAN[DBSCAN\nprecomputed metric]
-    DBSCAN --> Labels[labels_\n-1 = noise]
-    DBSCAN --> Membership[family_membership\nconfidence in 0 to 1]
-    Labels --> Therapeutic[describe\nTherapeuticResponse]
+    Input[Input array X] --> Weights[Feature weights<br>normalised to sum 1]
+    Weights --> FeatureSim[Per-feature similarity<br>rbf or linear or match]
+    FeatureSim --> WFRMatrix[Pairwise WFR<br>distance matrix]
+    WFRMatrix --> DBSCAN[DBSCAN<br>precomputed metric]
+    DBSCAN --> Labels[labels_<br>-1 = noise]
+    DBSCAN --> Membership[family_membership<br>confidence in 0 to 1]
+    Labels --> Therapeutic[describe<br>TherapeuticResponse]
     Membership --> Therapeutic
-    Therapeutic --> Output[label confidence\nboundary description]
-    MCP[UseTrace MCP extra\nPI 43 schema from use] --> Inducer[induce_with_confidence\nmin_support gate]
+    Therapeutic --> Output[label confidence<br>boundary description]
+    MCP[UseTrace MCP extra<br>PI 43 schema from use] --> Inducer[induce_with_confidence<br>min_support gate]
     Inducer --> Schema[JSON Schema or None]
 ```
 
