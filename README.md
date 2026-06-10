@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/hinanohart/family-resemblance/blob/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/family-resemblance.svg)](https://pypi.org/project/family-resemblance/)
 
-**`family-resemblance`** is a Python library that clusters data without ever picking a centre point. Instead of comparing each sample to a prototype or mean, it builds a pairwise weighted similarity matrix (one per feature), then uses DBSCAN's density-connectivity to grow clusters. When a point sits near a cluster boundary, the library does not invent a confident answer — it returns a `TherapeuticResponse` that honestly reports the limit (PI §133). No language model is involved; all computation is NumPy / scikit-learn.
+**`family-resemblance`** is a Python library that clusters data without ever picking a centre point. Instead of comparing each sample to a prototype or mean, it computes per-feature similarities and aggregates them (via user-supplied weights) into a single pairwise WFR distance matrix, then uses DBSCAN's density-connectivity to grow clusters. When a point sits near a cluster boundary, the library does not invent a confident answer — it returns a `TherapeuticResponse` that honestly reports the limit (PI §133). No language model is involved; all computation is NumPy / scikit-learn.
 
 ## Architecture
 
