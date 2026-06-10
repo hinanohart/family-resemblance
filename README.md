@@ -1,15 +1,19 @@
 # family-resemblance
 
-> Prototype-free clustering grounded in Wittgenstein's *Philosophical Investigations* §65–67.
-> Families form through overlapping pairwise similarities — no centroid, no shared essence.
-> [scikit-learn-compatible](https://scikit-learn.org/) estimator.
-
 [![CI](https://github.com/hinanohart/family-resemblance/actions/workflows/ci.yml/badge.svg)](https://github.com/hinanohart/family-resemblance/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/hinanohart/family-resemblance/blob/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/family-resemblance.svg)](https://pypi.org/project/family-resemblance/)
 
-**`family-resemblance`** is a Python library that clusters data without ever picking a centre point. Instead of comparing each sample to a prototype or mean, it computes per-feature similarities and aggregates them (via user-supplied weights) into a single pairwise WFR distance matrix, then uses DBSCAN's density-connectivity to grow clusters. When a point sits near a cluster boundary, the library does not invent a confident answer — it returns a `TherapeuticResponse` that honestly reports the limit (PI §133). No language model is involved; all computation is NumPy / scikit-learn.
+Prototype-free clustering grounded in Wittgenstein's *Philosophical Investigations* §65–67 — a [scikit-learn-compatible](https://scikit-learn.org/) estimator.
+
+**`family-resemblance`** clusters data without ever picking a centre point:
+
+- Computes per-feature similarities aggregated via user-supplied weights into a pairwise **WFR distance matrix**, then uses DBSCAN's density-connectivity to grow clusters.
+- When a point sits near a cluster boundary, returns a `TherapeuticResponse` that honestly reports the limit (PI §133) instead of inventing a confident answer.
+- No language model involved — all computation is NumPy / scikit-learn.
+
+> Families form through overlapping pairwise similarities — no centroid, no shared essence.
 
 ## Architecture
 
