@@ -1,13 +1,32 @@
 # family-resemblance
 
-> Weighted family-resemblance clustering grounded in Wittgenstein's
-> *Philosophical Investigations* §65–67. Prototype-free.
+> Prototype-free clustering grounded in Wittgenstein's *Philosophical Investigations* §65–67.
+> Families form through overlapping pairwise similarities — no centroid, no shared essence.
 > [scikit-learn-compatible](https://scikit-learn.org/) estimator.
 
 [![CI](https://github.com/hinanohart/family-resemblance/actions/workflows/ci.yml/badge.svg)](https://github.com/hinanohart/family-resemblance/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-%3E%3D3.10-blue)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/hinanohart/family-resemblance/blob/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/family-resemblance.svg)](https://pypi.org/project/family-resemblance/)
+
+**`family-resemblance`** is a Python library that clusters data without ever picking a centre point. Instead of comparing each sample to a prototype or mean, it builds a pairwise weighted similarity matrix (one per feature), then uses DBSCAN's density-connectivity to grow clusters. When a point sits near a cluster boundary, the library does not invent a confident answer — it returns a `TherapeuticResponse` that honestly reports the limit (PI §133). No language model is involved; all computation is NumPy / scikit-learn.
+
+## Architecture
+
+```mermaid
+flowchart TD
+    Input[Input array X] --> Weights[Feature weights\nnormalised to sum 1]
+    Weights --> FeatureSim[Per-feature similarity\nrbf or linear or match]
+    FeatureSim --> WFRMatrix[Pairwise WFR\ndistance matrix]
+    WFRMatrix --> DBSCAN[DBSCAN\nprecomputed metric]
+    DBSCAN --> Labels[labels_\n-1 = noise]
+    DBSCAN --> Membership[family_membership\nconfidence in 0 to 1]
+    Labels --> Therapeutic[describe\nTherapeuticResponse]
+    Membership --> Therapeutic
+    Therapeutic --> Output[label confidence\nboundary description]
+    MCP[UseTrace MCP extra\nPI 43 schema from use] --> Inducer[induce_with_confidence\nmin_support gate]
+    Inducer --> Schema[JSON Schema or None]
+```
 
 ## Install
 
@@ -67,6 +86,16 @@ feature-similarities (see [`core/wfr.py`](https://github.com/hinanohart/family-r
 No language model is in the loop. Schema induction, family membership,
 and the therapeutic boundary check are pure-mechanical (numpy / scikit-learn
 / genson only). The package does not ship, call, or fine-tune an LLM.
+
+## How it works
+
+1. **WFR distance** (`core/wfr.py`): For each pair of samples, compute per-feature similarity using one of three kernels (`rbf`, `linear`, `match`). Apply user-supplied feature weights (renormalised to sum to 1, uniform by default). Average to get a scalar similarity; convert to distance as `1 − similarity`.
+
+2. **WFRCluster** (`core/cluster.py`): Builds the full `(n_samples, n_samples)` precomputed distance matrix, then runs `sklearn.cluster.DBSCAN` on it. No centroid is ever selected. Noise points receive label `-1` (PI §201: rule-following indeterminacy).
+
+3. **Family membership** (`core/cluster.py`): Per-sample confidence is the mean WFR similarity to its cluster neighbours. Noise points have confidence `0.0`.
+
+4. **Therapeutic response** (`core/therapeutic.py`): `describe(label, confidence)` returns a `TherapeuticResponse`. If `confidence < threshold` or `label == -1`, the description cites PI §65–67 / §201 to make the limit explicit rather than issuing a confident but wrong answer.
 
 ## Wittgenstein → API map
 
