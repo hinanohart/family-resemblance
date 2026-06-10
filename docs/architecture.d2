@@ -1,0 +1,57 @@
+direction: down
+explanation: |md
+  ### family-resemblance
+  **Prototype-free clustering grounded in Wittgenstein's PI §65–67** — scikit-learn-compatible estimator using WFR distances and DBSCAN instead of centroids.
+| {near: top-center}
+
+input: "① Input array X" {shape: oval; style: {fill: "#6366f1"; font-color: "#fff"; stroke: "#4338ca"; bold: true; font-size: 18}}
+
+similarity: "Similarity Computation" {
+  style: {fill: "#f0fdf4"; stroke: "#10b981"; font-color: "#065f46"; bold: true; font-size: 16}
+  weights: "② Feature weights\nnormalised to sum 1"
+  feat_sim: "③ Per-feature similarity\nrbf / linear / match"
+  wfr: "④ Pairwise WFR\ndistance matrix"
+  weights -> feat_sim: "③ weight"
+  feat_sim -> wfr: "④ aggregate"
+  *.style.fill: "#dcfce7"; *.style.font-color: "#065f46"
+}
+
+clustering: "Clustering" {
+  style: {fill: "#fffbeb"; stroke: "#f59e0b"; font-color: "#92400e"; bold: true; font-size: 16}
+  dbscan: "⑤ DBSCAN\nprecomputed metric"
+  labels: "labels_\n-1 = noise"
+  membership: "family_membership\nconfidence 0–1"
+  dbscan -> labels: "⑤ assign"
+  dbscan -> membership: "⑤ score"
+  *.style.fill: "#fef3c7"; *.style.font-color: "#92400e"
+}
+
+output_zone: "Output" {
+  style: {fill: "#fdf2f8"; stroke: "#ec4899"; font-color: "#9d174e"; bold: true; font-size: 16}
+  therapeutic: "⑥ TherapeuticResponse\ndescribe boundary"
+  out: "label · confidence\nboundary description" {shape: cylinder}
+  therapeutic -> out: "⑥ emit"
+  *.style.fill: "#fdf2f8"; *.style.font-color: "#9d174e"
+}
+
+mcp_side: "MCP Extension" {
+  style: {fill: "#fffbeb"; stroke: "#f59e0b"; font-color: "#92400e"; bold: true; font-size: 16}
+  mcp: "UseTrace MCP extra\nPI §43 schema from use"
+  inducer: "induce_with_confidence\nmin_support gate"
+  schema: "JSON Schema or None" {shape: cylinder}
+  mcp -> inducer: "induce"
+  inducer -> schema: "emit"
+  *.style.fill: "#fef3c7"; *.style.font-color: "#92400e"
+}
+
+input -> similarity.weights: "① supply"
+similarity.wfr -> clustering.dbscan: "⑤ cluster"
+clustering.labels -> output_zone.therapeutic: "⑥ describe"
+clustering.membership -> output_zone.therapeutic: "⑥ describe"
+
+legend: "Legend" {
+  near: bottom-center
+  style: {fill: "#f8fafc"; stroke: "#cbd5e1"; font-size: 13}
+  e: "● entry"; c: "● core"; p: "● processing"; b: "● external"; d: "● output"
+  e.style.font-color: "#4338ca"; c.style.font-color: "#0369a1"; p.style.font-color: "#10b981"; b.style.font-color: "#f59e0b"; d.style.font-color: "#ec4899"
+}

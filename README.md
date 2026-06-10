@@ -17,20 +17,9 @@ Prototype-free clustering grounded in Wittgenstein's *Philosophical Investigatio
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    Input[Input array X] --> Weights[Feature weights<br>normalised to sum 1]
-    Weights --> FeatureSim[Per-feature similarity<br>rbf or linear or match]
-    FeatureSim --> WFRMatrix[Pairwise WFR<br>distance matrix]
-    WFRMatrix --> DBSCAN[DBSCAN<br>precomputed metric]
-    DBSCAN --> Labels[labels_<br>-1 = noise]
-    DBSCAN --> Membership[family_membership<br>confidence in 0 to 1]
-    Labels --> Therapeutic[describe<br>TherapeuticResponse]
-    Membership --> Therapeutic
-    Therapeutic --> Output[label confidence<br>boundary description]
-    MCP[UseTrace MCP extra<br>PI 43 schema from use] --> Inducer[induce_with_confidence<br>min_support gate]
-    Inducer --> Schema[JSON Schema or None]
-```
+<div align="center">
+  <img src="docs/architecture.png" alt="family-resemblance architecture" width="840">
+</div>
 
 ## Install
 
@@ -211,3 +200,4 @@ is, of course, Wittgenstein's.
 ## Status
 
 v0.1 alpha. See [`CHANGELOG.md`](https://github.com/hinanohart/family-resemblance/blob/main/CHANGELOG.md) for the roadmap.
+
